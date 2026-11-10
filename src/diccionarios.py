@@ -42,7 +42,7 @@ def indexa_por_iniciales(texto: str) -> dict[str, set[str]]:
         if clave in res:
             res[clave].add(palabra)
         else:
-            res[clave]= {palabra}
+            res[clave] = {palabra}
     return res
 
 

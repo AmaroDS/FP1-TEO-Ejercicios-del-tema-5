@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 
 
 def sustituye_palabras(texto: str, diccionario: dict[str, str]) -> str:
@@ -60,8 +60,19 @@ def construye_frecuencias_bigramas(texto: str) -> dict[str, float]:
     Devuelve:
         Diccionario que asocia a cada bigrama su frecuencia normalizada en el texto.
     """
-    # TODO: Implementar la función
-    pass
+    bigramas = []
+    texto = texto.lower()
+    for c1,c2 in zip(texto, texto[1:]):
+        if c1.isalpha() and c2.isalpha():
+            bigramas.append(c1+c2)
+    contador = Counter(bigramas)
+    #En el tema 6, aprenderemos a hacer este Counter
+    #sin crear en memoria la lista bigramas
+    total_bigramas = len(bigramas)
+    res = {}
+    for bigrama, conteo in contador.items():
+        res[bigrama] = conteo/total_bigramas
+    return res
 
 
 def calcula_distancia_media_frecuencias(freq1: dict[str, float], freq2: dict[str, float]) -> float:
@@ -76,8 +87,14 @@ def calcula_distancia_media_frecuencias(freq1: dict[str, float], freq2: dict[str
     Devuelve:
         Distancia media entre los dos vectores de frecuencias, o 0.0 si ambos diccionarios están vacíos.
     """
-    # TODO: Implementar la función
-    pass
+    if len(freq1)==0 and len(freq2)==0:
+        return 0.0
+    
+    todos_bigramas = set(freq1.keys()).union(set(freq2.keys()))
+    suma_diferencias = 0
+    for bigrama in todos_bigramas:
+        suma_diferencias += abs(freq1.get(bigrama, 0) - freq2.get(bigrama, 0))
+        return suma_diferencias / len(todos_bigramas)
 
 def identifica_idioma(textos_ejemplo: dict[str, str], texto_a_identificar: str) -> str:
     """
@@ -91,8 +108,26 @@ def identifica_idioma(textos_ejemplo: dict[str, str], texto_a_identificar: str) 
     Devuelve:
         El idioma identificado del texto.
     """
-    # TODO: Implementar la función
-    pass
+    # 1. - Obtener el diccionario de frecuencias para texto_a_identificar (dic_objetivo)
+    dic_objetivo=construye_frecuencias_bigramas(texto_a_identificar)
+
+    distancias_idiomas = []
+    # 2.- Recorrer el diccionario textos_ejemplo
+    for idioma, texto_idioma in textos_ejemplo.items():
+        #   3.- Obtener el diccionario de frecuencias para el idioma actual (dic_idiomas)
+        dic_idioma = construye_frecuencias_bigramas(texto_idioma)
+        #   4.- Calcula la distamcoa entre dic_idioma y dic_objetivo
+        distancia = calcula_distancia_media_frecuencias(dic_objetivo, dic_idioma)
+        #   5.- Guardamos en una lista (distancia, identificador_idioma)
+        distancias_idiomas.append((distancia, idioma))
+        # 6.- Buscar el minimo de la lista (menor_distancia)
+        _ , idioma = min(distancias_idiomas)
+        # 7.- Devolver el idenificador de idioma
+        return idioma
+
+
+
+        
 
 
 
